@@ -44,7 +44,6 @@ public class CustomerService {
         customer.setUpdatedAt(Instant.now());
         Customer createdCustomer = customerRepository.save(customer);
         return customerMapper.toResponseDto(createdCustomer);
-
     }
 
     @Transactional(readOnly = true)
