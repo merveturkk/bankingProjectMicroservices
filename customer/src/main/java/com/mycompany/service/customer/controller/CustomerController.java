@@ -31,7 +31,7 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CreateCustomerRequest request) {
 
-        CustomerResponse response= customerService.createCustomer(request);
+        CustomerResponse response = customerService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -42,19 +42,14 @@ public class CustomerController {
 
 
     @GetMapping
-    public ResponseEntity<List<CustomerResponse>> getCustomers(
-            @RequestParam(required = false) CustomerStatus status) {
-
-        if (status == null) {
-            return ResponseEntity.ok(customerService.getCustomersActive()); // default ACTIVE
-        }
-        return ResponseEntity.ok(customerService.getCustomersByStatus(status));
+    public ResponseEntity<List<CustomerResponse>> getCustomers(@RequestParam(required = false) CustomerStatus status) {
+        return ResponseEntity.ok(customerService.getCustomers(status));
     }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable UUID id, @Valid @RequestBody UpdateCustomerRequest request){
-        return ResponseEntity.ok(customerService.updateCustomer(id,request));
+    @PutMapping
+    public ResponseEntity<CustomerResponse> updateCustomer(@Valid @RequestBody UpdateCustomerRequest request) {
+        return ResponseEntity.ok(customerService.updateCustomer(request));
 
     }
 
@@ -63,11 +58,6 @@ public class CustomerController {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-
 
 
 }

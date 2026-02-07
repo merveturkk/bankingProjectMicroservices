@@ -2,35 +2,42 @@ package com.mycompany.service.customer.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import lombok.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UpdateCustomerRequest {
+public record UpdateCustomerRequest(
 
-    @NotBlank
-    private String firstName;
+        @NotNull
+        UUID id,
 
-    @NotBlank
-    private String lastName;
+        @NotBlank(message = "First name is required")
+        String firstName,
 
-    @NotBlank
-    @Email
-    private String email;
+        @NotBlank(message = "Last name is required")
+        String lastName,
 
-    @NotBlank
-    private String phoneNumber;
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        String email,
 
-    @Size(max = 200)
-    private String address;
+        @NotBlank(message = "Phone number is required")
+        @Pattern(
+                regexp = "^\\+[1-9]\\d{7,14}$",
+                message = "Phone number must be in international format (e.g. +905551112233)"
+        )
+        String phoneNumber,
 
-    @NotNull
-    @Past
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate dateOfBirth;
+        @Size(max = 200)
+        String address,
+
+        @Past(message = "Date of birth must be in the past")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate dateOfBirth,
+
+        @NotNull
+        Long version
+
+
+) {
 }

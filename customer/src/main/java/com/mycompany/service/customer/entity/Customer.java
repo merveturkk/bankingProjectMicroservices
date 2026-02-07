@@ -2,7 +2,7 @@ package com.mycompany.service.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +16,11 @@ import java.util.UUID;
 
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "customers")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
 public class Customer {
 
     @Id
@@ -26,38 +28,37 @@ public class Customer {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+    @Column(name = "first_name", nullable = false, length = 25)
+    @Size(min = 2, max = 50)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
+    @Column(name = "last_name", nullable = false, length = 50)
+    @Size(min = 2, max = 50)
     private String lastName;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    @Size(max = 50, message = "Email must not exceed 50 characters")
-    @Column(unique = true, nullable = false, length = 50)
+    @Size(max = 50)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @NotBlank(message = "Password is required")
     @Size(min = 4, max = 50)
     @Column(nullable = false)
     private String password;
 
-    @NotBlank(message = "Phone number is required")
-    @Column(nullable = false, length = 50)
+    @Column(name = "phone_number", nullable = false, length = 20)
     private String phoneNumber;
 
-    @Size(max = 200, message = "Address must not exceed 200 characters")
+    @Size(max = 200)
     private String address;
 
-    @NotNull(message = "Customer status is required")
+    @Column(name = "customer_status")
     @Enumerated(EnumType.STRING)
     private CustomerStatus customerStatus;
 
-    @Past(message = "Date of birth must be in the past")
+    @Column(name = "date_of_birth")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 
@@ -66,6 +67,4 @@ public class Customer {
 
     @LastModifiedDate
     private Instant updatedAt;
-
-
 }

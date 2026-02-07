@@ -1,18 +1,17 @@
 package com.mycompany.service.customer.service;
 
-import com.mycompany.service.customer.dto.CustomerResponse;
 import com.mycompany.service.customer.dto.CreateCustomerRequest;
+import com.mycompany.service.customer.dto.CustomerMapper;
+import com.mycompany.service.customer.dto.CustomerResponse;
 import com.mycompany.service.customer.dto.UpdateCustomerRequest;
 import com.mycompany.service.customer.entity.Customer;
 import com.mycompany.service.customer.entity.CustomerStatus;
-import com.mycompany.service.customer.exception.CustomerAlreadyDeletedException;
 import com.mycompany.service.customer.exception.CustomerAlreadyExistsException;
 import com.mycompany.service.customer.exception.CustomerNotFoundException;
-import com.mycompany.service.customer.mapper.CustomerMapper;
+import com.mycompany.service.customer.exception.OptimisticConflictException;
 import com.mycompany.service.customer.repository.CustomerRepository;
-import org.jspecify.annotations.Nullable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,18 +29,16 @@ public class CustomerService {
         this.customerMapper = customerMapper;
     }
 
-
     @Transactional
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
 
-        if (customerRepository.existsByEmail(request.getEmail())) {
-            throw new CustomerAlreadyExistsException(request.getEmail());
-        }
+        customerRepository.findByEmail(request.email())
+                .ifPresent(c -> {
+                    throw new CustomerAlreadyExistsException(request.email());
+                });
 
         Customer customer = customerMapper.toEntity(request);
-        customer.setCustomerStatus(CustomerStatus.ACTIVE);
-        customer.setCreatedAt(Instant.now());
-        customer.setUpdatedAt(Instant.now());
+
         Customer createdCustomer = customerRepository.save(customer);
         return customerMapper.toResponseDto(createdCustomer);
     }
@@ -54,51 +51,42 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<CustomerResponse> getCustomersActive() {
-        return customerRepository.findAllByCustomerStatus(CustomerStatus.ACTIVE)
+    public List<CustomerResponse> getCustomers(CustomerStatus status) {
+
+        CustomerStatus effectiveStatus = (status != null) ? status : CustomerStatus.ACTIVE;
+
+        return customerRepository.findAllByCustomerStatus(effectiveStatus)
                 .stream()
                 .map(customerMapper::toResponseDto)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<CustomerResponse> getCustomersByStatus(CustomerStatus status) {
-        return customerRepository.findAllByCustomerStatus(status)
-                .stream()
-                .map(customerMapper::toResponseDto)
-                .toList();
-    }
+    public CustomerResponse updateCustomer(UpdateCustomerRequest request) {
 
+        Customer customer = customerRepository.findById(request.id())
+                .orElseThrow(() -> new CustomerNotFoundException(request.id()));
 
-
-
-    public CustomerResponse updateCustomer(UUID id, UpdateCustomerRequest request) {
-
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException(id));
-
-        customerMapper.updateEntity(request,customer);
-        customer.setUpdatedAt(Instant.now());
-
+        if (!customer.getVersion().equals(request.version())) {
+            throw new OptimisticConflictException();
+        }
+        customerMapper.updateEntity(request, customer);
         return customerMapper.toResponseDto(customerRepository.save(customer));
-
     }
-
-
 
     @Transactional
     public void deleteCustomer(UUID id) {
-
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
 
         if (customer.getCustomerStatus() == CustomerStatus.SUSPENDED) {
-            throw new CustomerAlreadyDeletedException(id);
-
+            return;
         }
+
         customer.setCustomerStatus(CustomerStatus.SUSPENDED);
         customer.setUpdatedAt(Instant.now());
     }
+
+
 }
 
 

@@ -1,15 +1,15 @@
 package com.mycompany.service.customer.exception;
 
-import com.mycompany.service.customer.error.ApiErrorResponse;
-import com.mycompany.service.customer.error.ApiValidationError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,7 +18,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //customer not found
     @ExceptionHandler(CustomerNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handle(CustomerNotFoundException ex,
                                                    HttpServletRequest req) {
@@ -27,39 +26,38 @@ public class GlobalExceptionHandler {
                         "CUSTOMER_NOT_FOUND",
                         "Customer not found",
                         req.getRequestURI(),
-                        Instant.now()
+                        Instant.now(),
+                        Map.of()
+
                 ));
     }
 
-
-    // customer alredy exist
     @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorResponse> handleAlreadyExists(
-            CustomerAlreadyExistsException ex,
-            HttpServletRequest req) {
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiErrorResponse(
-                "CUSTOMER_ALREADY_EXISTS",
-                ex.getMessage(),
-                req.getRequestURI(),
-                Instant.now()
-        ));
+    public ResponseEntity<ApiErrorResponse> handle(CustomerAlreadyExistsException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ApiErrorResponse(
+                        "CUSTOMER_ALREADY_EXISTS",
+                        ex.getMessage(),
+                        req.getRequestURI(),
+                        Instant.now(),
+                        Map.of()
+                )
+        );
     }
 
-    //invalid parameter
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
-                                                       HttpServletRequest req) {
-        return ResponseEntity.badRequest().body(new ApiErrorResponse(
-                "INVALID_PATH_PARAMETER",
-                "Invalid parameter: " + ex.getName(),
-                req.getRequestURI(),
-                Instant.now()
-        ));
+                                                               HttpServletRequest req) {
+        return ResponseEntity.badRequest()
+                .body(new ApiErrorResponse(
+                        "INVALID_PATH_PARAMETER",
+                        "Invalid parameter: " + ex.getName(),
+                        req.getRequestURI(),
+                        Instant.now(),
+                        Map.of()
+                ));
     }
 
-
-    //HttpMessageConverter (Jackson)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleNotReadable(
             HttpMessageNotReadableException ex,
@@ -69,7 +67,8 @@ public class GlobalExceptionHandler {
                 "MALFORMED_JSON",
                 "Request body is invalid or cannot be parsed",
                 req.getRequestURI(),
-                Instant.now()
+                Instant.now(),
+                Map.of()
         ));
     }
 
@@ -82,28 +81,13 @@ public class GlobalExceptionHandler {
                 "INTERNAL_ERROR",
                 "Unexpected error occurred",
                 req.getRequestURI(),
-                Instant.now()
+                Instant.now(),
+                Map.of()
         ));
     }
 
-    @ExceptionHandler(CustomerAlreadyDeletedException.class)
-    public ResponseEntity<ApiErrorResponse> handleAlreadyDeleted(
-            CustomerAlreadyDeletedException ex,
-            HttpServletRequest req) {
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                new ApiErrorResponse(
-                        "CUSTOMER_ALREADY_DELETED",
-                        ex.getMessage(),
-                        req.getRequestURI(),
-                        Instant.now()
-                )
-        );
-    }
-
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiValidationError> handleValidation(
+    public ResponseEntity<ApiErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,
             HttpServletRequest req) {
 
@@ -112,12 +96,25 @@ public class GlobalExceptionHandler {
                 .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
 
         return ResponseEntity.badRequest().body(
-                new ApiValidationError(
+                new ApiErrorResponse(
                         "VALIDATION_ERROR",
                         "Validation failed",
                         req.getRequestURI(),
                         Instant.now(),
                         errors
+                )
+        );
+    }
+
+    @ExceptionHandler({ObjectOptimisticLockingFailureException.class, OptimisticConflictException.class})
+    public ResponseEntity<ApiErrorResponse> handleOptimisticLock(Exception ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ApiErrorResponse(
+                        "OPTIMISTIC_LOCK",
+                        "Resource was updated by another request. Please retry.",
+                        req.getRequestURI(),
+                        Instant.now(),
+                        Map.of()
                 )
         );
     }
