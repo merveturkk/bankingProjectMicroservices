@@ -3,6 +3,7 @@ package com.mycompany.service.customer.controller;
 
 import com.mycompany.service.customer.dto.CreateCustomerRequest;
 import com.mycompany.service.customer.dto.CustomerResponse;
+import com.mycompany.service.customer.dto.PageResponse;
 import com.mycompany.service.customer.dto.UpdateCustomerRequest;
 import com.mycompany.service.customer.entity.CustomerStatus;
 import com.mycompany.service.customer.exception.ErrorResponse;
@@ -15,10 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Customer API", description = "API for managing customer in the system")
@@ -54,12 +58,14 @@ public interface ICustomerController {
     ResponseEntity<CustomerResponse> getCustomerById(@PathVariable UUID id);
 
 
-    @Operation(summary = "List all customers", description = "Retrieve a list of all customers")
+    @Operation(summary = "List all customers", description = "Retrieve a paginated list of customers")
     @ApiResponse(responseCode = "200", description = "List of customers retrieved successfully")
     @GetMapping
-    ResponseEntity<List<CustomerResponse>> getCustomers(
+    ResponseEntity<PageResponse<CustomerResponse>> getCustomers(
             @Parameter(description = "Filter by status (e.g., ACTIVE, SUSPENDED)")
-            @RequestParam(required = false) CustomerStatus status);
+            @RequestParam(required = false) CustomerStatus status,
+            @PageableDefault(size = 20, sort = "firstName", direction = Sort.Direction.DESC)
+            @ParameterObject Pageable pageable);
 
 
     @Operation(summary = "Update an existing customer", description = "Updates customer details. Requires the current version for optimistic locking.")

@@ -1,20 +1,18 @@
 package com.mycompany.service.customer.service;
 
-import com.mycompany.service.customer.dto.CreateCustomerRequest;
-import com.mycompany.service.customer.dto.CustomerMapper;
-import com.mycompany.service.customer.dto.CustomerResponse;
-import com.mycompany.service.customer.dto.UpdateCustomerRequest;
+import com.mycompany.service.customer.dto.*;
 import com.mycompany.service.customer.entity.Customer;
 import com.mycompany.service.customer.entity.CustomerStatus;
 import com.mycompany.service.customer.exception.CustomerAlreadyExistsException;
 import com.mycompany.service.customer.exception.CustomerNotFoundException;
 import com.mycompany.service.customer.exception.OptimisticConflictException;
 import com.mycompany.service.customer.repository.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -51,15 +49,15 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<CustomerResponse> getCustomers(CustomerStatus status) {
-
+    public PageResponse<CustomerResponse> getCustomers(CustomerStatus status, Pageable pageable) {
         CustomerStatus effectiveStatus = (status != null) ? status : CustomerStatus.ACTIVE;
 
-        return customerRepository.findAllByCustomerStatus(effectiveStatus)
-                .stream()
-                .map(customerMapper::toResponseDto)
-                .toList();
+        Page<CustomerResponse> dtoPage = customerRepository
+                .findAllByCustomerStatus(effectiveStatus, pageable)
+                .map(customerMapper::toResponseDto);
+        return PageResponse.of(dtoPage);
     }
+
 
     public CustomerResponse updateCustomer(UpdateCustomerRequest request) {
 
