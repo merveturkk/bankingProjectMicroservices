@@ -1,5 +1,6 @@
 package com.mycompany.service.customer.exception;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
