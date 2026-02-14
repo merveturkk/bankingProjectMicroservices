@@ -5,9 +5,9 @@ plugins {
     id "org.openapi.generator" version "7.5.0"
 }
 
-group = 'com.example'
+group = 'com.mycompany'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+description = 'Customer Service - Banking Microservice'
 
 java {
     toolchain {
@@ -26,24 +26,71 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // OpenAPI & Swagger
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
     implementation 'io.swagger.core.v3:swagger-core-jakarta:2.2.21'
+
+    // MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    // Database & Runtime
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:kafka'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// OpenAPI Generator
+openApiGenerate {
+    generatorName = "spring"
+    library = "spring-boot"
+    inputSpec = "$rootDir/src/main/resources/swagger/openapi.yml"
+    outputDir = "$buildDir/generated-sources/openapi"
+
+    generateApiTests = false
+
+    globalProperties = [
+            "verbose"             : "true",
+            "debugSupportingFiles": "true"
+    ]
+
+    configOptions = [
+            basePackage          : "com.mycompany.service.customer.gen",
+            apiPackage           : "com.mycompany.service.customer.gen.api",
+            modelPackage         : "com.mycompany.service.customer.gen.model",
+            useSpringBoot3       : "true",
+            documentationProvider: "springdoc",
+            serializationLibrary : "jackson",
+            helpTxt              : "false",
+            interfaceOnly        : "true",
+            serviceInterface     : "false",
+            useBeanValidation    : "true",
+            exceptionHandler     : "false",
+            useSwaggerUI         : "false",
+            useJakartaEe         : "true",
+            openApiNullable      : "false",
+            skipDefaultInterface : "true",
+            reactive             : "false",
+            useTags              : "true",
+            useResponseEntity    : "true"
+    ]
 }
 
 tasks.named('test') {

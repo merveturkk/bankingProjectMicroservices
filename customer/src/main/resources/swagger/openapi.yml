@@ -1,0 +1,313 @@
+openapi: 3.0.3
+info:
+  title: Customer Service API
+  description: API for managing customers in the banking microservice.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: /api/v1
+    description: API base path
+
+paths:
+  /customers:
+    post:
+      tags:
+        - Customer
+      summary: Create a new customer
+      description: Add a new customer to the system.
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          description: Invalid customer data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+
+    get:
+      tags:
+        - Customer
+      summary: List all customers
+      description: Retrieve a paginated list of customers. Optionally filter by status.
+      operationId: getCustomers
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ ACTIVE, SUSPENDED ]
+          description: Filter by customer status
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '500':
+          description: Internal Server Error
+
+  /customers/{id}:
+    get:
+      tags:
+        - Customer
+      summary: Get a customer by ID
+      operationId: getCustomerById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+
+    put:
+      tags:
+        - Customer
+      summary: Update an existing customer
+      description: Requires current version for optimistic locking.
+      operationId: updateCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerRequest'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+
+    delete:
+      tags:
+        - Customer
+      summary: Soft delete a customer
+      description: Sets status to SUSPENDED.
+      operationId: deleteCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successfully suspended
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    CustomerStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+
+    CreateCustomerRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - phoneNumber
+        - password
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+          pattern: '^\+[1-9]\d{7,14}$'
+        password:
+          type: string
+          minLength: 4
+          maxLength: 50
+        address:
+          type: string
+          maxLength: 200
+        dateOfBirth:
+          type: string
+          format: date
+      example:
+        firstName: Jane
+        lastName: Doe
+        email: jane@example.com
+        phoneNumber: "+905551112233"
+        password: "secret123"
+        address: Istanbul, Turkey
+        dateOfBirth: "1990-01-15"
+
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        address:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        version:
+          type: integer
+          format: int64
+
+    UpdateCustomerRequest:
+      type: object
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - phoneNumber
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+          pattern: '^\+[1-9]\d{7,14}$'
+        address:
+          type: string
+          maxLength: 200
+        dateOfBirth:
+          type: string
+          format: date
+        version:
+          type: integer
+          format: int64
+
+    PageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageResponse'
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        isLast:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
