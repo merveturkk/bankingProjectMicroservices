@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.dto;
+package com.merve.dto;
 
 import org.springframework.data.domain.Page;
 

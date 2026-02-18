@@ -1,12 +1,15 @@
-package com.mycompany.service.customer.dto;
+package com.merve.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-public record CreateCustomerRequest(
+public record UpdateCustomerRequest(
 
+        @NotNull
+        UUID id,
 
         @NotBlank(message = "First name is required")
         String firstName,
@@ -25,15 +28,16 @@ public record CreateCustomerRequest(
         )
         String phoneNumber,
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 4, max = 50)
-        String password,
-
         @Size(max = 200)
         String address,
 
         @Past(message = "Date of birth must be in the past")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate dateOfBirth
+        LocalDate dateOfBirth,
+
+        @NotNull
+        Long version
+
+
 ) {
 }

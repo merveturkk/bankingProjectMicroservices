@@ -1,8 +1,8 @@
-package com.mycompany.service.customer.dto;
+package com.merve.dto;
 
 
-import com.mycompany.service.customer.entity.Customer;
-import com.mycompany.service.customer.entity.CustomerStatus;
+import com.merve.entity.Customer;
+import com.merve.entity.CustomerStatus;
 import org.mapstruct.*;
 
 import java.time.Instant;

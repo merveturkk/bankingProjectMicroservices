@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.validation;
+package com.merve.validation;
 
 
 import jakarta.validation.ConstraintValidator;

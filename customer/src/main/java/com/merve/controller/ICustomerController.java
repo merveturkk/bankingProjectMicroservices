@@ -1,12 +1,12 @@
-package com.mycompany.service.customer.controller;
+package com.merve.controller;
 
 
-import com.mycompany.service.customer.dto.CreateCustomerRequest;
-import com.mycompany.service.customer.dto.CustomerResponse;
-import com.mycompany.service.customer.dto.PageResponse;
-import com.mycompany.service.customer.dto.UpdateCustomerRequest;
-import com.mycompany.service.customer.entity.CustomerStatus;
-import com.mycompany.service.customer.exception.ErrorResponse;
+import com.merve.dto.CreateCustomerRequest;
+import com.merve.dto.CustomerResponse;
+import com.merve.dto.PageResponse;
+import com.merve.dto.UpdateCustomerRequest;
+import com.merve.entity.CustomerStatus;
+import com.merve.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.entity;
+package com.merve.entity;
 
 public enum CustomerStatus {
         ACTIVE,

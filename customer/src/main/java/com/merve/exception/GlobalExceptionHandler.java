@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.exception;
+package com.merve.exception;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;

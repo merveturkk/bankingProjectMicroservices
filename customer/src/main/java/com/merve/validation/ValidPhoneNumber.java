@@ -1,8 +1,7 @@
-package com.mycompany.service.customer.validation;
+package com.merve.validation;
 
 
 import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
@@ -10,11 +9,8 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PasswordConstraintValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidPassword {
+public @interface ValidPhoneNumber {
 
-    String message() default "Password does not meet security requirements";
-
+    String message() default "Invalid phone number";
     Class<?>[] groups() default {};
-
-    Class<? extends Payload>[] payload() default {};
 }

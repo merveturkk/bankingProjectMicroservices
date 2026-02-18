@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.exception;
+package com.merve.exception;
 
 import java.util.UUID;
 

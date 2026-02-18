@@ -1,12 +1,12 @@
-package com.mycompany.service.customer.service;
+package com.merve.service;
 
-import com.mycompany.service.customer.dto.*;
-import com.mycompany.service.customer.entity.Customer;
-import com.mycompany.service.customer.entity.CustomerStatus;
-import com.mycompany.service.customer.exception.CustomerAlreadyExistsException;
-import com.mycompany.service.customer.exception.CustomerNotFoundException;
-import com.mycompany.service.customer.exception.OptimisticConflictException;
-import com.mycompany.service.customer.repository.CustomerRepository;
+import com.merve.dto.*;
+import com.merve.entity.Customer;
+import com.merve.entity.CustomerStatus;
+import com.merve.exception.CustomerAlreadyExistsException;
+import com.merve.exception.CustomerNotFoundException;
+import com.merve.exception.OptimisticConflictException;
+import com.merve.repository.CustomerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

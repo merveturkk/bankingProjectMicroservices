@@ -1,12 +1,12 @@
-package com.mycompany.service.customer.controller;
+package com.merve.controller;
 
 
-import com.mycompany.service.customer.dto.CreateCustomerRequest;
-import com.mycompany.service.customer.dto.CustomerResponse;
-import com.mycompany.service.customer.dto.PageResponse;
-import com.mycompany.service.customer.dto.UpdateCustomerRequest;
-import com.mycompany.service.customer.entity.CustomerStatus;
-import com.mycompany.service.customer.service.CustomerService;
+import com.merve.dto.CreateCustomerRequest;
+import com.merve.dto.CustomerResponse;
+import com.merve.dto.PageResponse;
+import com.merve.dto.UpdateCustomerRequest;
+import com.merve.entity.CustomerStatus;
+import com.merve.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

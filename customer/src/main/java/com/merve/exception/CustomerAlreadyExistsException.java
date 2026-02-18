@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.exception;
+package com.merve.exception;
 
 public class CustomerAlreadyExistsException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.entity;
+package com.merve.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;

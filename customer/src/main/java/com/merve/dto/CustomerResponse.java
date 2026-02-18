@@ -1,4 +1,4 @@
-package com.mycompany.service.customer.dto;
+package com.merve.dto;
 
 import java.time.LocalDate;
 import java.util.UUID;

@@ -1,7 +1,7 @@
-package com.mycompany.service.customer.repository;
+package com.merve.repository;
 
-import com.mycompany.service.customer.entity.Customer;
-import com.mycompany.service.customer.entity.CustomerStatus;
+import com.merve.entity.Customer;
+import com.merve.entity.CustomerStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
